@@ -299,6 +299,15 @@ public extension SceneLocationView {
     func addLocationNodesWithConfirmedLocation(locationNodes: [LocationNode]) {
         locationNodes.forEach { addLocationNodeWithConfirmedLocation(locationNode: $0) }
     }
+    
+    func removeNodeFromScene(_ node: SCNNode) {
+        guard let childNodes = sceneNode?.childNodes else { return }
+        for child in childNodes {
+            if node == child {
+                child.removeFromParentNode()
+            }
+        }
+    }
 
     func removeAllNodes() {
         locationNodes.removeAll()
@@ -339,6 +348,7 @@ public extension SceneLocationView {
             i += 1
         }
         if i >= 0 {
+            removeNodeFromScene(locationNodes[i])
             locationNodes[i].removeFromParentNode()
             locationNodes.remove(at: i)
         }
@@ -346,6 +356,7 @@ public extension SceneLocationView {
     
     func removeLocationNode(locationNode: LocationNode) {
         if let index = locationNodes.firstIndex(of: locationNode) {
+            removeNodeFromScene(locationNode)
             locationNode.removeFromParentNode()
             locationNodes.remove(at: index)
         }
@@ -408,6 +419,7 @@ public extension SceneLocationView {
     func removeRoutes(routes: [MKRoute]) {
         routes.forEach { route in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == route.polyline }) {
+                removeNodeFromScene(polylineNodes[index])
                 polylineNodes[index].removeFromParentNode()
                 polylineNodes.remove(at: index)
             }
@@ -456,6 +468,7 @@ public extension SceneLocationView {
             i += 1
         }
         if i >= 0 {
+            removeNodeFromScene(polylineNodes[i])
             polylineNodes[i].removeFromParentNode()
             polylineNodes.remove(at: i)
         }
@@ -464,6 +477,7 @@ public extension SceneLocationView {
     func removePolylines(polylines: [MKPolyline]) {
         polylines.forEach { polyline in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == polyline }) {
+                removeNodeFromScene(polylineNodes[index])
                 polylineNodes[index].removeFromParentNode()
                 polylineNodes.remove(at: index)
             }
