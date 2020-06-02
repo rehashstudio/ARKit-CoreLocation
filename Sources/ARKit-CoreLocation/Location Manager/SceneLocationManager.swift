@@ -71,9 +71,8 @@ public final class SceneLocationManager {
                     let position = sceneLocationDelegate?.scenePosition else { return nil }
 
                 return bestEstimate.translatedLocation(to: position)
-            } else {
-                return _currentLocation
             }
+            return _currentLocation
         }
         set {
             _currentLocation = newValue
@@ -154,6 +153,8 @@ extension SceneLocationManager: LocationManagerDelegate {
 
     func locationManagerDidUpdateLocation(_ locationManager: LocationManager,
                                           location: CLLocation) {
-        addSceneLocationEstimate(location: location)
+        if locationEstimateMethod != .none {
+            addSceneLocationEstimate(location: location)
+        }
     }
 }
