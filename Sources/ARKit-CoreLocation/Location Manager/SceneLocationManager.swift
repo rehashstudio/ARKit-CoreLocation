@@ -61,7 +61,7 @@ public final class SceneLocationManager {
         return sortedLocationEstimates.first
     }
 
-    private var _currentLocation: CLLocation? = CLLocation()
+    private weak var _currentLocation: CLLocation?
     public var currentLocation: CLLocation? {
         get {
             if locationEstimateMethod == .coreLocationDataOnly {
@@ -96,7 +96,7 @@ public final class SceneLocationManager {
     }
 
     ///Adds a scene location estimate based on current time, camera position and location from location manager
-    func addSceneLocationEstimate(location: CLLocation) {
+    public func addSceneLocationEstimate(location: CLLocation) {
         guard let position = sceneLocationDelegate?.scenePosition else { return }
 
         sceneLocationEstimates.append(SceneLocationEstimate(location: location, position: position))
@@ -104,7 +104,7 @@ public final class SceneLocationManager {
         sceneLocationDelegate?.didAddSceneLocationEstimate(position: position, location: location)
     }
 
-    func removeOldLocationEstimates() {
+    public func removeOldLocationEstimates() {
         guard let currentScenePosition = sceneLocationDelegate?.scenePosition else { return }
         removeOldLocationEstimates(currentScenePosition: currentScenePosition)
     }
