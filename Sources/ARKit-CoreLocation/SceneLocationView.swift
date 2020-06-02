@@ -328,12 +328,25 @@ public extension SceneLocationView {
         return locationNodes.filter { $0.tag == tag }
     }
 
+    func removeLocationNode(tag: String) {
+        var i: Int = -1
+        for node in locationNodes {
+            if node.tag == tag {
+                break
+            }
+            i += 1
+        }
+        if i >= 0 {
+            locationNodes[i].removeFromParentNode()
+            locationNodes.remove(at: i)
+        }
+    }
+    
     func removeLocationNode(locationNode: LocationNode) {
         if let index = locationNodes.firstIndex(of: locationNode) {
+            locationNode.removeFromParentNode()
             locationNodes.remove(at: index)
         }
-
-        locationNode.removeFromParentNode()
     }
 
     func removeLocationNodes(locationNodes: [LocationNode]) {
@@ -393,6 +406,7 @@ public extension SceneLocationView {
     func removeRoutes(routes: [MKRoute]) {
         routes.forEach { route in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == route.polyline }) {
+                polylineNodes[index].removeFromParentNode()
                 polylineNodes.remove(at: index)
             }
         }
@@ -431,9 +445,24 @@ public extension SceneLocationView {
         }
     }
 
+    func removePolyline(title: String) {
+        var i: Int = -1
+        for node in polylineNodes {
+            if node.polyline.title == title {
+                break
+            }
+            i += 1
+        }
+        if i >= 0 {
+            polylineNodes[i].removeFromParentNode()
+            polylineNodes.remove(at: i)
+        }
+    }
+    
     func removePolylines(polylines: [MKPolyline]) {
         polylines.forEach { polyline in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == polyline }) {
+                polylineNodes[index].removeFromParentNode()
                 polylineNodes.remove(at: index)
             }
         }
