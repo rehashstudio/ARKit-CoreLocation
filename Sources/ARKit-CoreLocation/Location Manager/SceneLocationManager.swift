@@ -20,6 +20,9 @@ public enum LocationEstimateMethod {
     ///Combines knowledge about movement through the AR world with
     ///the most relevant Core Location estimate (based on accuracy and time).
     case mostRelevantEstimate
+    
+    ///Do not estimate location. Location is set manually.
+    case none
 }
 
 protocol SceneLocationManagerDelegate: class {
@@ -58,13 +61,23 @@ public final class SceneLocationManager {
         return sortedLocationEstimates.first
     }
 
+    private var _currentLocation: CLLocation? = CLLocation()
     public var currentLocation: CLLocation? {
-        if locationEstimateMethod == .coreLocationDataOnly { return locationManager.currentLocation }
+        get {
+            if locationEstimateMethod == .coreLocationDataOnly {
+                return locationManager.currentLocation
+            } else if locationEstimateMethod == .mostRelevantEstimate {
+                guard let bestEstimate = bestLocationEstimate,
+                    let position = sceneLocationDelegate?.scenePosition else { return nil }
 
-        guard let bestEstimate = bestLocationEstimate,
-            let position = sceneLocationDelegate?.scenePosition else { return nil }
-
-        return bestEstimate.translatedLocation(to: position)
+                return bestEstimate.translatedLocation(to: position)
+            } else {
+                return _currentLocation
+            }
+        }
+        set {
+            _currentLocation = newValue
+        }
     }
 
     init() {
