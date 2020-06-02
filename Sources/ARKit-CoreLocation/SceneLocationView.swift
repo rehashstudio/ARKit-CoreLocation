@@ -304,8 +304,12 @@ public extension SceneLocationView {
         locationNodes.removeAll()
         guard let childNodes = sceneNode?.childNodes else { return }
         for node in childNodes {
+            node.geometry!.firstMaterial!.normal.contents = nil
+            node.geometry!.firstMaterial!.diffuse.contents = nil
             node.removeFromParentNode()
         }
+        polylineNodes = []
+        locationNodes = []
     }
 
     /// Determine if scene contains a node with the specified tag
@@ -337,6 +341,8 @@ public extension SceneLocationView {
             i += 1
         }
         if i >= 0 {
+            locationNodes[i].geometry!.firstMaterial!.normal.contents = nil
+            locationNodes[i].geometry!.firstMaterial!.diffuse.contents = nil
             locationNodes[i].removeFromParentNode()
             locationNodes.remove(at: i)
         }
@@ -344,6 +350,8 @@ public extension SceneLocationView {
     
     func removeLocationNode(locationNode: LocationNode) {
         if let index = locationNodes.firstIndex(of: locationNode) {
+            locationNodes[index].geometry!.firstMaterial!.normal.contents = nil
+            locationNodes[index].geometry!.firstMaterial!.diffuse.contents = nil
             locationNode.removeFromParentNode()
             locationNodes.remove(at: index)
         }
@@ -406,6 +414,8 @@ public extension SceneLocationView {
     func removeRoutes(routes: [MKRoute]) {
         routes.forEach { route in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == route.polyline }) {
+                polylineNodes[index].geometry!.firstMaterial!.normal.contents = nil
+                polylineNodes[index].geometry!.firstMaterial!.diffuse.contents = nil
                 polylineNodes[index].removeFromParentNode()
                 polylineNodes.remove(at: index)
             }
@@ -454,6 +464,8 @@ public extension SceneLocationView {
             i += 1
         }
         if i >= 0 {
+            polylineNodes[i].geometry!.firstMaterial!.normal.contents = nil
+            polylineNodes[i].geometry!.firstMaterial!.diffuse.contents = nil
             polylineNodes[i].removeFromParentNode()
             polylineNodes.remove(at: i)
         }
@@ -462,6 +474,8 @@ public extension SceneLocationView {
     func removePolylines(polylines: [MKPolyline]) {
         polylines.forEach { polyline in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == polyline }) {
+                polylineNodes[index].geometry!.firstMaterial!.normal.contents = nil
+                polylineNodes[index].geometry!.firstMaterial!.diffuse.contents = nil
                 polylineNodes[index].removeFromParentNode()
                 polylineNodes.remove(at: index)
             }
