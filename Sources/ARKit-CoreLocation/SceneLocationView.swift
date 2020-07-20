@@ -37,6 +37,8 @@ open class SceneLocationView: ARSCNView {
         case orientationTracking
         case worldTracking
     }
+    
+    
 
     public weak var locationViewDelegate: SceneLocationViewDelegate?
     public weak var locationEstimateDelegate: SceneLocationViewEstimateDelegate?

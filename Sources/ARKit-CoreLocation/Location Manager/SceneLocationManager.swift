@@ -75,6 +75,7 @@ public final class SceneLocationManager {
             return _currentLocation
         }
         set {
+            locationManager.currentLocation = newValue
             _currentLocation = newValue
         }
     }
@@ -150,7 +151,6 @@ public extension SceneLocationManager {
 }
 
 extension SceneLocationManager: LocationManagerDelegate {
-
     func locationManagerDidUpdateLocation(_ locationManager: LocationManager,
                                           location: CLLocation) {
         if locationEstimateMethod != .none {

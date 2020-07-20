@@ -46,7 +46,7 @@ public class LocationManager: NSObject {
         self.locationManager!.distanceFilter = kCLDistanceFilterNone
         self.locationManager!.headingFilter = kCLHeadingFilterNone
         self.locationManager!.pausesLocationUpdatesAutomatically = false
-        self.locationManager!.delegate = self
+        //self.locationManager!.delegate = self
         self.locationManager!.startUpdatingHeading()
         self.locationManager!.startUpdatingLocation()
 
@@ -83,7 +83,7 @@ extension LocationManager: CLLocationManagerDelegate {
             delegate?.locationManagerDidUpdateLocation(self, location: $0)
         }
 
-        //self.currentLocation = manager.location
+        self.currentLocation = manager.location
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
