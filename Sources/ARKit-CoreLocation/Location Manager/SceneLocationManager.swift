@@ -38,7 +38,7 @@ protocol SceneLocationManagerDelegate: class {
 public final class SceneLocationManager {
     weak var sceneLocationDelegate: SceneLocationManagerDelegate?
 
-    public var locationEstimateMethod: LocationEstimateMethod = .mostRelevantEstimate
+    public var locationEstimateMethod: LocationEstimateMethod = .none
     public let locationManager = LocationManager()
 
     var sceneLocationEstimates = [SceneLocationEstimate]()
