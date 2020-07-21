@@ -82,6 +82,8 @@ extension LocationManager: CLLocationManagerDelegate {
         locations.forEach {
             delegate?.locationManagerDidUpdateLocation(self, location: $0)
         }
+
+        self.currentLocation = manager.location
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {

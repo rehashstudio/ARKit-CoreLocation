@@ -38,7 +38,7 @@ protocol SceneLocationManagerDelegate: class {
 public final class SceneLocationManager {
     weak var sceneLocationDelegate: SceneLocationManagerDelegate?
 
-    public var locationEstimateMethod: LocationEstimateMethod = .none
+    public var locationEstimateMethod: LocationEstimateMethod = .mostRelevantEstimate
     public let locationManager = LocationManager()
 
     var sceneLocationEstimates = [SceneLocationEstimate]()
@@ -154,7 +154,6 @@ extension SceneLocationManager: LocationManagerDelegate {
     func locationManagerDidUpdateLocation(_ locationManager: LocationManager,
                                           location: CLLocation) {
         if locationEstimateMethod != .none {
-            locationManager.currentLocation = location
             addSceneLocationEstimate(location: location)
         }
     }
