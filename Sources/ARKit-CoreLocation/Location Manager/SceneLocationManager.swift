@@ -154,6 +154,7 @@ extension SceneLocationManager: LocationManagerDelegate {
     func locationManagerDidUpdateLocation(_ locationManager: LocationManager,
                                           location: CLLocation) {
         if locationEstimateMethod != .none {
+            locationManager.currentLocation = location
             addSceneLocationEstimate(location: location)
         }
     }
