@@ -44,6 +44,25 @@ public class PolylineNode: LocationNode {
 
         contructNodes()
     }
+    
+    public init(polyline: MKPolyline,
+                locationNodes: [LocationNode],
+                tag: String? = nil,
+                boxBuilder: BoxBuilder? = nil) {
+        
+        assert(polyline.pointCount == locationNodes.count)
+        
+        self.altitude = 0.0
+        self.boxBuilder = boxBuilder ?? Constants.defaultBuilder
+        self.locationNodes = locationNodes
+        self.polyline = polyline
+        
+        super.init(location: nil)
+
+        self.tag = tag ?? Constants.defaultTag
+        
+        
+    }
 
 	required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

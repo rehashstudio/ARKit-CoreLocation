@@ -431,6 +431,31 @@ public extension SceneLocationView {
 
 @available(iOS 11.0, *)
 public extension SceneLocationView {
+    func addPolyline(polyline: MKPolyline, locations: [CLLocation], boxBuilder: BoxBuilder? = nil) {
+        var locationNodes: [LocationNode] = []
+        for location in locations {
+            locationNodes.append(LocationNode(location: location))
+        }
+        
+        polylineNodes.append(PolylineNode(polyline: polyline,
+                                          locationNodes: locationNodes,
+                                          tag: polyline.title,
+                                          boxBuilder: boxBuilder
+        ))
+
+        for polylineNode in polylineNodes {
+            for locationNode in polylineNode.locationNodes {
+                let locationNodeLocation = self.locationOfLocationNode(locationNode)
+                locationNode.updatePositionAndScale(setup: true,
+                                          scenePosition: currentScenePosition,
+                                          locationNodeLocation: locationNodeLocation,
+                                          locationManager: sceneLocationManager,
+                                          onCompletion: {})
+                sceneNode?.addChildNode(locationNode)
+            }
+        }
+    }
+    
     /// Adds polylines to the scene and lets you specify the geometry prototype for the box.
     /// Note: You can provide your own SCNBox prototype to base the direction nodes from.
     ///
