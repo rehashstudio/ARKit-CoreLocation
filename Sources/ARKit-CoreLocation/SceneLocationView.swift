@@ -431,7 +431,9 @@ public extension SceneLocationView {
 
 @available(iOS 11.0, *)
 public extension SceneLocationView {
-    func addPolyline(polyline: MKPolyline, locations: [CLLocation], boxBuilder: BoxBuilder? = nil) {
+    func addPolyline(polyline: MKPolyline,
+                     locations: [CLLocation],
+                     boxBuilder: BoxBuilder? = nil) {
         var locationNodes: [LocationNode] = []
         for location in locations {
             locationNodes.append(LocationNode(location: location))
