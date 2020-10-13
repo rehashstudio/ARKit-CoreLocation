@@ -16,7 +16,7 @@ public typealias BoxBuilder = (_ distance: CGFloat) -> SCNBox
 
 /// A Node that is used to show directions in AR-CL.
 public class PolylineNode: LocationNode {
-    public private(set) var locationNodes = [LocationNode]()
+    public var locationNodes = [LocationNode]()
 
     public let polyline: MKPolyline
     public let altitude: CLLocationDistance
