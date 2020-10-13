@@ -431,46 +431,27 @@ public extension SceneLocationView {
 
 @available(iOS 11.0, *)
 public extension SceneLocationView {
-    func addPolyline(polyline: MKPolyline,
-                     locations: [CLLocation],
-                     boxBuilder: BoxBuilder? = nil) {
-        var locationNodes: [LocationNode] = []
-        for location in locations {
-            locationNodes.append(LocationNode(location: location))
-        }
-        
-        polylineNodes.append(PolylineNode(polyline: polyline,
-                                          locationNodes: locationNodes,
-                                          tag: polyline.title,
-                                          boxBuilder: boxBuilder
-        ))
-
-        for polylineNode in polylineNodes {
-            for locationNode in polylineNode.locationNodes {
-                let locationNodeLocation = self.locationOfLocationNode(locationNode)
-                locationNode.updatePositionAndScale(setup: true,
-                                          scenePosition: currentScenePosition,
-                                          locationNodeLocation: locationNodeLocation,
-                                          locationManager: sceneLocationManager,
-                                          onCompletion: {})
-                sceneNode?.addChildNode(locationNode)
-            }
-        }
-    }
-    
     /// Adds polylines to the scene and lets you specify the geometry prototype for the box.
     /// Note: You can provide your own SCNBox prototype to base the direction nodes from.
     ///
     /// - Parameters:
     ///   - polylines: A set of MKPolyline.
     ///   - boxBuilder: A block that will customize how a box is built.
-    func addPolylines(polylines: [MKPolyline], boxBuilder: BoxBuilder? = nil) {
+    func addPolylines(polylines: [MKPolyline],
+                      boxBuilder: BoxBuilder? = nil,
+                      locations: [[CLLocation]] = []) {
 
         guard let altitude = sceneLocationManager.currentLocation?.altitude else {
             return assertionFailure("we don't have an elevation")
         }
-        polylines.forEach { (polyline) in
-            polylineNodes.append(PolylineNode(polyline: polyline, altitude: altitude - 2.0, boxBuilder: boxBuilder))
+        for i in 0 ..< polylines.count {
+            let polyline: MKPolyline = polylines[i]
+            let locs: [CLLocation] = locations.count == polylines.count ? locations[i] : []
+            polylineNodes.append(PolylineNode(polyline: polyline,
+                                              altitude: altitude - 2.0,
+                                              tag: polyline.title,
+                                              boxBuilder: boxBuilder,
+                                              locations: locs))
         }
 
         polylineNodes.forEach {

@@ -33,35 +33,17 @@ public class PolylineNode: LocationNode {
     public init(polyline: MKPolyline,
                 altitude: CLLocationDistance,
                 tag: String? = nil,
-                boxBuilder: BoxBuilder? = nil) {
+                boxBuilder: BoxBuilder? = nil,
+                locations: [CLLocation] = []) {
         self.polyline = polyline
         self.altitude = altitude
         self.boxBuilder = boxBuilder ?? Constants.defaultBuilder
-
-        super.init(location: nil)
-
-        self.tag = tag ?? Constants.defaultTag
-
-        contructNodes()
-    }
-    
-    public init(polyline: MKPolyline,
-                locationNodes: [LocationNode],
-                tag: String? = nil,
-                boxBuilder: BoxBuilder? = nil) {
-        
-        assert(polyline.pointCount == locationNodes.count)
-        
-        self.altitude = 0.0
-        self.boxBuilder = boxBuilder ?? Constants.defaultBuilder
-        self.locationNodes = locationNodes
-        self.polyline = polyline
         
         super.init(location: nil)
 
         self.tag = tag ?? Constants.defaultTag
-        
-        
+
+        contructNodes(locations)
     }
 
 	required public init?(coder aDecoder: NSCoder) {
@@ -86,30 +68,42 @@ private extension PolylineNode {
     /// This is what actually builds the SCNNodes and appends them to the
     /// locationNodes collection so they can be added to the scene and shown
     /// to the user.  If the prototype box is nil, then the default box will be used
-    func contructNodes() {
-        let points = polyline.points()
-
-        for i in 0 ..< polyline.pointCount - 1 {
-            let currentLocation = CLLocation(coordinate: points[i].coordinate, altitude: altitude)
-            let nextLocation = CLLocation(coordinate: points[i + 1].coordinate, altitude: altitude)
-            let midLocation = currentLocation.approxMidpoint(to: nextLocation)
-
-            let distance = currentLocation.distance(from: nextLocation)
-
-            let box = boxBuilder(CGFloat(distance))
-            let boxNode = SCNNode(geometry: box)
-            boxNode.removeFlicker()
-
-            let bearing = -currentLocation.bearing(between: nextLocation)
-
-            // Orient the line to point from currentLoction to nextLocation
-            boxNode.eulerAngles.y = Float(bearing).degreesToRadians
-
-            let locationNode = LocationNode(location: midLocation, tag: tag)
-            locationNode.addChildNode(boxNode)
-
-            locationNodes.append(locationNode)
+    func contructNodes(_ locations: [CLLocation] = []) {
+        if locations.isEmpty {
+            let points = polyline.points()
+            for i in 0 ..< polyline.pointCount - 1 {
+                let a = CLLocation(coordinate: points[i].coordinate, altitude: altitude)
+                let b = CLLocation(coordinate: points[i + 1].coordinate, altitude: altitude)
+                makeLocationNode(a, b)
+            }
+        } else {
+            for i in 0 ..< locations.count - 1 {
+                let a: CLLocation = locations[i]
+                let b: CLLocation = locations[i + 1]
+                makeLocationNode(a, b)
+            }
         }
+    }
+    
+    private func makeLocationNode(_ a: CLLocation,
+                                  _ b: CLLocation) {
+        let c: CLLocation = a.approxMidpoint(to: b)
+        
+        let distance = a.distance(from: b)
+
+        let box = boxBuilder(CGFloat(distance))
+        let boxNode = SCNNode(geometry: box)
+        boxNode.removeFlicker()
+
+        let bearing = -a.bearing(between: b)
+
+        // Orient the line to point from currentLoction to nextLocation
+        boxNode.eulerAngles.y = Float(bearing).degreesToRadians
+
+        let locationNode = LocationNode(location: c, tag: tag)
+        locationNode.addChildNode(boxNode)
+
+        locationNodes.append(locationNode)
     }
 
 }
