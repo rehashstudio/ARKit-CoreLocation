@@ -20,7 +20,7 @@ public class PolylineNode: LocationNode {
 
     public let polyline: MKPolyline
     public let altitude: CLLocationDistance
-    public let boxBuilder: BoxBuilder
+    public var boxBuilder: BoxBuilder?
 
     /// Creates a `PolylineNode` from the provided polyline, altitude (which is assumed to be uniform
     /// for all of the points) and an optional SCNBox to use as a prototype for the location boxes.
@@ -49,7 +49,6 @@ public class PolylineNode: LocationNode {
 	required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
 	}
-
 }
 
 // MARK: - Implementation
@@ -91,7 +90,7 @@ private extension PolylineNode {
         
         let distance = a.distance(from: b)
 
-        let box = boxBuilder(CGFloat(distance))
+        let box = boxBuilder!(CGFloat(distance))
         let boxNode = SCNNode(geometry: box)
         boxNode.removeFlicker()
 

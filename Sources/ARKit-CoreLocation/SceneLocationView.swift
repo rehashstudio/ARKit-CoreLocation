@@ -302,12 +302,23 @@ public extension SceneLocationView {
         locationNodes.forEach { addLocationNodeWithConfirmedLocation(locationNode: $0) }
     }
     
+    private func releaseNode(_ node: SCNNode) {
+        for child in node.childNodes {
+            child.geometry = nil
+            releaseNode(child)
+        }
+        if let node = node as? PolylineNode {
+            node.boxBuilder = nil
+        }
+        node.geometry = nil
+        node.removeFromParentNode()
+    }
+    
     func removeNodeFromScene(_ node: SCNNode) {
         guard let childNodes = sceneNode?.childNodes else { return }
         for child in childNodes {
             if node == child {
-                child.geometry = nil
-                child.removeFromParentNode()
+                releaseNode(child)
             }
         }
     }
@@ -316,8 +327,7 @@ public extension SceneLocationView {
         locationNodes.removeAll()
         guard let childNodes = sceneNode?.childNodes else { return }
         for node in childNodes {
-            node.geometry = nil
-            node.removeFromParentNode()
+            releaseNode(node)
         }
         polylineNodes = []
         locationNodes = []
