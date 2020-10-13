@@ -12,6 +12,10 @@ public extension SCNVector3 {
     ///Calculates distance between vectors
     ///Doesn't include the y axis, matches functionality of CLLocation 'distance' function.
     func distance(to anotherVector: SCNVector3) -> Float {
-        return sqrt(pow(anotherVector.x - x, 2) + pow(anotherVector.z - z, 2))
+        return sqrt(
+            pow(anotherVector.x - x, 2.0) +
+            pow(anotherVector.y - y, 2.0) +
+            pow(anotherVector.z - z, 2.0)
+        )
     }
 }
