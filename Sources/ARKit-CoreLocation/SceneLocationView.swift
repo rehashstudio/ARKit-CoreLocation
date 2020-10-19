@@ -308,14 +308,15 @@ public extension SceneLocationView {
         }
         if let node = node as? PolylineNode {
             node.boxBuilder = nil
+            print( "\(sceneNode?.childNodes.count) nodes before removal" )
             for child in node.locationNodes {
                 removeNodeFromScene(child)
             }
+            print( "\(sceneNode?.childNodes.count) nodes after removal" )
+            node.locationNodes = []
         }
         node.geometry = nil
         node.removeFromParentNode()
-        
-        print( "\(sceneNode?.childNodes.count) nodes after removal" )
     }
     
     func removeAllNodes() {
