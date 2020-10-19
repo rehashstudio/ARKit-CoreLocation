@@ -303,7 +303,7 @@ public extension SceneLocationView {
     }
     
     private func releaseNode(_ node: SCNNode) {
-        while let child = node.childNodes.first {
+        for child in node.childNodes {
             releaseNode(child)
         }
         if let node = node as? PolylineNode {
@@ -315,7 +315,7 @@ public extension SceneLocationView {
     
     func removeNodeFromScene(_ node: SCNNode) {
         guard let childNodes = sceneNode?.childNodes else { return }
-        while let child = childNodes.first {
+        for child in childNodes {
             if node == child {
                 print( "Removing node: \(child.name)" )
                 releaseNode(child)
@@ -326,12 +326,13 @@ public extension SceneLocationView {
 
     func removeAllNodes() {
         locationNodes.removeAll()
-        guard let childNodes = sceneNode?.childNodes else { return }
-        while let child = childNodes.first {
-            releaseNode(child)
-        }
         polylineNodes = []
         locationNodes = []
+        if let childNodes = sceneNode?.childNodes {
+            for child in childNodes {
+                releaseNode(child)
+            }
+        }
     }
 
     /// Determine if scene contains a node with the specified tag
