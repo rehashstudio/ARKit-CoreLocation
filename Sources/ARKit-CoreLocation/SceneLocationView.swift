@@ -24,14 +24,14 @@ open class SceneLocationView: ARSCNView {
     /// The limit to the scene, in terms of what data is considered reasonably accurate.
     /// Measured in meters.
     static let sceneLimit = 100.0
-
+    
     /// The type of tracking to use.
     ///
     /// - orientationTracking: Informs the `SceneLocationView` to use Device Orientation tracking only.
-	///  Useful when your nodes are all CLLocation based, and are not synced to real world planes
+    ///  Useful when your nodes are all CLLocation based, and are not synced to real world planes
     ///  See [Apple's documentation](https://developer.apple.com/documentation/arkit/arorientationtrackingconfiguration)
     /// - worldTracking: Informs the `SceneLocationView` to use a World Tracking Configuration.
-	///  Useful when you have nodes that attach themselves to real world planes
+    ///  Useful when you have nodes that attach themselves to real world planes
     ///  See [Apple's documentation](https://developer.apple.com/documentation/arkit/arworldtrackingconfiguration#overview)
     public enum ARTrackingType {
         case orientationTracking
@@ -39,14 +39,14 @@ open class SceneLocationView: ARSCNView {
     }
     
     
-
+    
     public weak var locationViewDelegate: SceneLocationViewDelegate?
     public weak var locationEstimateDelegate: SceneLocationViewEstimateDelegate?
     public weak var locationNodeTouchDelegate: LNTouchDelegate?
     public weak var sceneTrackingDelegate: SceneTrackingDelegate?
-
+    
     public let sceneLocationManager = SceneLocationManager()
-
+    
     /// Addresses [Issue #196](https://github.com/ProjectDent/ARKit-CoreLocation/issues/196) -
     /// Delegate issue when assigned to self (no location nodes render).   If the user
     /// tries to set the delegate, perform an assertionFailure and tell them to set the `arViewDelegate` instead.
@@ -63,12 +63,12 @@ open class SceneLocationView: ARSCNView {
             return super.delegate
         }
     }
-
+    
     /// If you wish to receive delegate `ARSCNViewDelegate` events, use this instead of the `delegate` property.
     /// The `delegate` property is reserved for this class itself and trying to set it will result in an assertionFailure
     /// and in production, things just won't work as you expect.
     public weak var arViewDelegate: ARSCNViewDelegate?
-
+    
     /// The method to use for determining locations.
     /// Not advisable to change this as the scene is ongoing.
     public var locationEstimateMethod: LocationEstimateMethod {
@@ -77,24 +77,24 @@ open class SceneLocationView: ARSCNView {
         }
         set {
             sceneLocationManager.locationEstimateMethod = newValue
-
+            
             locationNodes.forEach { $0.locationEstimateMethod = newValue }
         }
     }
-
+    
     /// When set to true, displays an axes node at the start of the scene
     public var showAxesNode = false
-
+    
     public internal(set) var sceneNode: SCNNode? {
         didSet {
             guard sceneNode != nil else { return }
-
+            
             locationNodes.forEach { sceneNode?.addChildNode($0) }
-
+            
             locationViewDelegate?.didSetupSceneNode(sceneLocationView: self, sceneNode: sceneNode!)
         }
     }
-
+    
     /// Only to be overrided if you plan on manually setting True North.
     /// When true, sets up the scene to face what the device considers to be True North.
     /// This can be inaccurate, hence the option to override it.
@@ -103,28 +103,28 @@ open class SceneLocationView: ARSCNView {
     /// thus affecting your alterations.
     /// The initial value of this property is respected.
     public var orientToTrueNorth = true
-
+    
     /// Whether debugging feature points should be displayed.
     /// Defaults to false
     public var showFeaturePoints = false
-
+    
     // MARK: Scene location estimates
     public var currentScenePosition: SCNVector3? {
         guard let pointOfView = pointOfView else { return nil }
         return scene.rootNode.convertPosition(pointOfView.position, to: sceneNode)
     }
-
+    
     public var currentEulerAngles: SCNVector3? { return pointOfView?.eulerAngles }
-
+    
     public internal(set) var locationNodes = [LocationNode]()
     public internal(set) var polylineNodes = [PolylineNode]()
     public internal(set) var arTrackingType: ARTrackingType = .worldTracking
-
+    
     // MARK: Internal desclarations
     internal var didFetchInitialLocation = false
-
+    
     // MARK: Setup
-
+    
     /// This initializer allows you to specify the type of tracking configuration (defaults to world tracking) as well as
     /// some other optional values.
     ///
@@ -136,50 +136,50 @@ open class SceneLocationView: ARSCNView {
         self.init(frame: frame, options: options)
         self.arTrackingType = trackingType
     }
-
+    
     public override init(frame: CGRect, options: [String: Any]? = nil) {
         super.init(frame: frame, options: options)
         finishInitialization()
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         finishInitialization()
     }
-
+    
     private func finishInitialization() {
         sceneLocationManager.sceneLocationDelegate = self
-
+        
         delegate = self
-
+        
         // Show statistics such as fps and timing information
         showsStatistics = false
-
+        
         debugOptions = showFeaturePoints ? [ARSCNDebugOptions.showFeaturePoints] : debugOptions
-
+        
         let touchGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(sceneLocationViewTouched(sender:)))
         self.addGestureRecognizer(touchGestureRecognizer)
     }
-
+    
     /// Resets the scene heading to 0
     func resetSceneHeading() {
         sceneNode?.eulerAngles.y = 0
     }
-
+    
     func confirmLocationOfLocationNode(_ locationNode: LocationNode) {
         locationNode.location = locationOfLocationNode(locationNode)
         locationViewDelegate?.didConfirmLocationOfNode(sceneLocationView: self, node: locationNode)
     }
-
+    
     /// Gives the best estimate of the location of a node
     public func locationOfLocationNode(_ locationNode: LocationNode) -> CLLocation {
         if locationNode.locationConfirmed || locationEstimateMethod == .coreLocationDataOnly {
             return locationNode.location!
         }
-
+        
         if let bestLocationEstimate = sceneLocationManager.bestLocationEstimate,
-            locationNode.location == nil
-                || bestLocationEstimate.location.horizontalAccuracy < locationNode.location!.horizontalAccuracy {
+           locationNode.location == nil
+            || bestLocationEstimate.location.horizontalAccuracy < locationNode.location!.horizontalAccuracy {
             return bestLocationEstimate.translatedLocation(to: locationNode.position)
         } else {
             return locationNode.location!
@@ -189,7 +189,7 @@ open class SceneLocationView: ARSCNView {
 
 @available(iOS 11.0, *)
 public extension SceneLocationView {
-
+    
     func run() {
         switch arTrackingType {
         case .worldTracking:
@@ -197,7 +197,7 @@ public extension SceneLocationView {
             configuration.planeDetection = .horizontal
             configuration.worldAlignment = orientToTrueNorth ? .gravityAndHeading : .gravity
             session.run(configuration)
-
+            
         case .orientationTracking:
             let configuration = AROrientationTrackingConfiguration()
             configuration.worldAlignment = orientToTrueNorth ? .gravityAndHeading : .gravity
@@ -205,14 +205,14 @@ public extension SceneLocationView {
         }
         sceneLocationManager.run()
     }
-
+    
     func pause() {
         session.pause()
         sceneLocationManager.pause()
     }
-
+    
     // MARK: True North
-
+    
     /// iOS can be inaccurate when setting true north
     /// The scene is oriented to true north, and will update its heading when it gets a more accurate reading
     /// You can disable this through setting the
@@ -225,37 +225,37 @@ public extension SceneLocationView {
     func moveSceneHeadingClockwise() {
         sceneNode?.eulerAngles.y -= Float(1).degreesToRadians
     }
-
+    
     /// Moves the scene heading anti-clockwise by 1 degree
     /// Intended for correctional purposes
     func moveSceneHeadingAntiClockwise() {
         sceneNode?.eulerAngles.y += Float(1).degreesToRadians
     }
-
+    
     // MARK: LocationNodes
-
+    
     /// Upon being added, a node's location, locationConfirmed and position may be modified and should not be changed externally.
     /// Silently fails and returns without adding the node to the scene if any of `currentScenePosition`,
     /// `sceneLocationManager.currentLocation`, or `sceneNode` is `nil`.
     func addLocationNodeForCurrentPosition(locationNode: LocationNode) {
         guard let currentPosition = currentScenePosition,
-            let currentLocation = sceneLocationManager.currentLocation,
-            let sceneNode = sceneNode else { return }
-
+              let currentLocation = sceneLocationManager.currentLocation,
+              let sceneNode = sceneNode else { return }
+        
         locationNode.location = currentLocation
         locationNode.position = currentPosition
-
+        
         locationNodes.append(locationNode)
         sceneNode.addChildNode(locationNode)
     }
-
+    
     /// Each node's addition to the scene can silently fail; See `addLocationNodeForCurrentPosition(locationNode:)`.
     ///
     /// Why would we want to add multiple nodes at the current position?
     func addLocationNodesForCurrentPosition(locationNodes: [LocationNode]) {
         locationNodes.forEach { addLocationNodeForCurrentPosition(locationNode: $0) }
     }
-
+    
     /// Silently fails and returns without adding the node unless`location` is not `nil` and `locationConfirmed` is `true`.
     /// Upon being added, a node's position will be modified internally and should not be changed externally.
     /// `location` will not be modified, but taken as accurate.
@@ -263,40 +263,40 @@ public extension SceneLocationView {
         if locationNode.location == nil || locationNode.locationConfirmed == false {
             return
         }
-
+        
         let locationNodeLocation = locationOfLocationNode(locationNode)
-
+        
         locationNode.updatePositionAndScale(setup: true,
                                             scenePosition: currentScenePosition, locationNodeLocation: locationNodeLocation,
                                             locationManager: sceneLocationManager) {
-                                                self.locationViewDelegate?
-                                                    .didUpdateLocationAndScaleOfLocationNode(sceneLocationView: self,
-                                                                                             locationNode: locationNode)
+            self.locationViewDelegate?
+                .didUpdateLocationAndScaleOfLocationNode(sceneLocationView: self,
+                                                         locationNode: locationNode)
         }
-
+        
         locationNodes.append(locationNode)
         sceneNode?.addChildNode(locationNode)
     }
-
+    
     @objc func sceneLocationViewTouched(sender: UITapGestureRecognizer) {
         guard let touchedView = sender.view as? SCNView else {
             return
         }
-
+        
         let coordinates = sender.location(in: touchedView)
         let hitTests = touchedView.hitTest(coordinates)
-
+        
         guard let firstHitTest = hitTests.first else {
             return
         }
-
+        
         if let touchedNode = firstHitTest.node as? AnnotationNode {
             self.locationNodeTouchDelegate?.annotationNodeTouched(node: touchedNode)
         } else if let locationNode = firstHitTest.node.parent as? LocationNode {
             self.locationNodeTouchDelegate?.locationNodeTouched(node: locationNode)
         }
     }
-
+    
     /// Each node's addition to the scene can silently fail; See `addLocationNodeWithConfirmedLocation(locationNode:)`.
     func addLocationNodesWithConfirmedLocation(locationNodes: [LocationNode]) {
         locationNodes.forEach { addLocationNodeWithConfirmedLocation(locationNode: $0) }
@@ -317,7 +317,7 @@ public extension SceneLocationView {
         
         print( "\(sceneNode?.childNodes.count) nodes after removal" )
     }
-
+    
     func removeAllNodes() {
         locationNodes.removeAll()
         polylineNodes = []
@@ -328,7 +328,7 @@ public extension SceneLocationView {
             }
         }
     }
-
+    
     /// Determine if scene contains a node with the specified tag
     ///
     /// - Parameter tag: tag text
@@ -336,7 +336,7 @@ public extension SceneLocationView {
     func sceneContainsNodeWithTag(_ tag: String) -> Bool {
         return findNodes(tagged: tag).count > 0
     }
-
+    
     /// Find all location nodes in the scene tagged with `tag`
     ///
     /// - Parameter tag: The tag text for which to search nodes.
@@ -345,10 +345,10 @@ public extension SceneLocationView {
         guard tag.count > 0 else {
             return []
         }
-
+        
         return locationNodes.filter { $0.tag == tag }
     }
-
+    
     func removeLocationNode(tag: String) {
         var i: Int = -1
         for node in locationNodes {
@@ -369,7 +369,7 @@ public extension SceneLocationView {
             locationNodes.remove(at: index)
         }
     }
-
+    
     func removeLocationNodes(locationNodes: [LocationNode]) {
         locationNodes.forEach { removeLocationNode(locationNode: $0) }
     }
@@ -377,7 +377,7 @@ public extension SceneLocationView {
 
 @available(iOS 11.0, *)
 public extension SceneLocationView {
-
+    
     /// Adds routes to the scene and lets you specify the geometry prototype for the box.
     /// Note: You can provide your own SCNBox prototype to base the direction nodes from.
     ///
@@ -389,7 +389,7 @@ public extension SceneLocationView {
                                                          attribute: $0.name) },
                   boxBuilder: boxBuilder)
     }
-
+    
     /// Adds polylines to the scene and lets you specify the geometry prototype for the box.
     /// Note: You can provide your own SCNBox prototype to base the direction nodes from.
     ///
@@ -409,21 +409,21 @@ public extension SceneLocationView {
                          tag: $0.attribute,
                          boxBuilder: boxBuilder)
         }
-
+        
         polylineNodes.append(contentsOf: polyNodes)
         polyNodes.forEach {
             $0.locationNodes.forEach {
                 let locationNodeLocation = self.locationOfLocationNode($0)
                 $0.updatePositionAndScale(setup: true,
                                           scenePosition: currentScenePosition,
-                                              locationNodeLocation: locationNodeLocation,
+                                          locationNodeLocation: locationNodeLocation,
                                           locationManager: sceneLocationManager,
                                           onCompletion: {})
-                sceneNode?.addChildNode($0)
+                //sceneNode?.addChildNode($0)
             }
         }
     }
-
+    
     func removeRoutes(routes: [MKRoute]) {
         routes.forEach { route in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == route.polyline }) {
@@ -444,7 +444,7 @@ public extension SceneLocationView {
     func addPolylines(polylines: [MKPolyline],
                       boxBuilder: BoxBuilder? = nil,
                       locations: [[CLLocation]] = []) {
-
+        
         guard let altitude = sceneLocationManager.currentLocation?.altitude else {
             return assertionFailure("we don't have an elevation")
         }
@@ -457,7 +457,7 @@ public extension SceneLocationView {
                                               boxBuilder: boxBuilder,
                                               locations: locs))
         }
-
+        
         polylineNodes.forEach {
             $0.locationNodes.forEach {
                 let locationNodeLocation = self.locationOfLocationNode($0)
@@ -466,11 +466,11 @@ public extension SceneLocationView {
                                           locationNodeLocation: locationNodeLocation,
                                           locationManager: sceneLocationManager,
                                           onCompletion: {})
-                sceneNode?.addChildNode($0)
+                //sceneNode?.addChildNode($0)
             }
         }
     }
-
+    
     func removePolyline(title: String) {
         var i: Int = -1
         for node in polylineNodes {
@@ -493,8 +493,8 @@ public extension SceneLocationView {
     func removePolylines(polylines: [MKPolyline]) {
         polylines.forEach { polyline in
             if let index = polylineNodes.firstIndex(where: {
-                                                        $0.polyline == polyline ||
-                                                            $0.polyline.title == polyline.title
+                $0.polyline == polyline ||
+                    $0.polyline.title == polyline.title
             }) {
                 removePolyline(at: index)
             }
@@ -505,52 +505,52 @@ public extension SceneLocationView {
 @available(iOS 11.0, *)
 extension SceneLocationView: SceneLocationManagerDelegate {
     var scenePosition: SCNVector3? { return currentScenePosition }
-
+    
     func confirmLocationOfDistantLocationNodes() {
         guard let currentPosition = currentScenePosition else { return }
-
+        
         locationNodes.filter { !$0.locationConfirmed }.forEach {
             let currentPoint = CGPoint.pointWithVector(vector: currentPosition)
             let locationNodePoint = CGPoint.pointWithVector(vector: $0.position)
-
+            
             if !currentPoint.radiusContainsPoint(radius: CGFloat(SceneLocationView.sceneLimit), point: locationNodePoint) {
                 confirmLocationOfLocationNode($0)
             }
         }
     }
-
+    
     /// Updates the position and scale of the `polylineNodes` and the `locationNodes`.
     func updatePositionAndScaleOfLocationNodes() {
-		polylineNodes.filter { $0.continuallyUpdatePositionAndScale }.forEach { node in
-			node.locationNodes.forEach { node in
-				let locationNodeLocation = self.locationOfLocationNode(node)
-				node.updatePositionAndScale(
+        polylineNodes.filter { $0.continuallyUpdatePositionAndScale }.forEach { node in
+            node.locationNodes.forEach { node in
+                let locationNodeLocation = self.locationOfLocationNode(node)
+                node.updatePositionAndScale(
                     setup: false,
                     scenePosition: currentScenePosition,
                     locationNodeLocation: locationNodeLocation,
                     locationManager: sceneLocationManager) {
-                        self.locationViewDelegate?.didUpdateLocationAndScaleOfLocationNode(
-                            sceneLocationView: self, locationNode: node)
-				} // updatePositionAndScale
-			} // foreach Location node
-		} // foreach Polyline node
-
+                    self.locationViewDelegate?.didUpdateLocationAndScaleOfLocationNode(
+                        sceneLocationView: self, locationNode: node)
+                } // updatePositionAndScale
+            } // foreach Location node
+        } // foreach Polyline node
+        
         locationNodes.filter { $0.continuallyUpdatePositionAndScale }.forEach { node in
             let locationNodeLocation = locationOfLocationNode(node)
             node.updatePositionAndScale(
                 scenePosition: currentScenePosition,
                 locationNodeLocation: locationNodeLocation,
                 locationManager: sceneLocationManager) {
-                    self.locationViewDelegate?.didUpdateLocationAndScaleOfLocationNode(
-                        sceneLocationView: self, locationNode: node)
+                self.locationViewDelegate?.didUpdateLocationAndScaleOfLocationNode(
+                    sceneLocationView: self, locationNode: node)
             }
         }
     }
-
+    
     func didAddSceneLocationEstimate(position: SCNVector3, location: CLLocation) {
         locationEstimateDelegate?.didAddSceneLocationEstimate(sceneLocationView: self, position: position, location: location)
     }
-
+    
     func didRemoveSceneLocationEstimate(position: SCNVector3, location: CLLocation) {
         locationEstimateDelegate?.didRemoveSceneLocationEstimate(sceneLocationView: self, position: position, location: location)
     }
