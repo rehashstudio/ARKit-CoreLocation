@@ -43,7 +43,22 @@ public class PolylineNode: LocationNode {
 
         self.tag = tag ?? Constants.defaultTag
 
-        contructNodes(locations)
+        if locations.isEmpty {
+            let points = polyline.points()
+            for i in 0 ..< polyline.pointCount - 1 {
+                let a = CLLocation(coordinate: points[i].coordinate,
+                                   altitude: altitude)
+                let b = CLLocation(coordinate: points[i + 1].coordinate,
+                                   altitude: altitude)
+                makeLocationNode(a, b)
+            }
+        } else {
+            for i in 0 ..< locations.count - 1 {
+                let a: CLLocation = locations[i]
+                let b: CLLocation = locations[i + 1]
+                makeLocationNode(a, b)
+            }
+        }
     }
 
 	required public init?(coder aDecoder: NSCoder) {
@@ -57,31 +72,17 @@ private extension PolylineNode {
 
     struct Constants {
         static let defaultBuilder: BoxBuilder = { (distance) -> SCNBox in
-            let box = SCNBox(width: 1, height: 0.2, length: distance, chamferRadius: 0)
-            box.firstMaterial?.diffuse.contents = UIColor(red: 47.0/255.0, green: 125.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+            let box = SCNBox(width: 1,
+                             height: 0.2,
+                             length: distance,
+                             chamferRadius: 0)
+            box.firstMaterial?.diffuse.contents = UIColor(red: 47.0/255.0,
+                                                          green: 125.0/255.0,
+                                                          blue: 255.0/255.0,
+                                                          alpha: 1.0)
             return box
         }
         static let defaultTag: String = ""
-    }
-
-    /// This is what actually builds the SCNNodes and appends them to the
-    /// locationNodes collection so they can be added to the scene and shown
-    /// to the user.  If the prototype box is nil, then the default box will be used
-    func contructNodes(_ locations: [CLLocation] = []) {
-        if locations.isEmpty {
-            let points = polyline.points()
-            for i in 0 ..< polyline.pointCount - 1 {
-                let a = CLLocation(coordinate: points[i].coordinate, altitude: altitude)
-                let b = CLLocation(coordinate: points[i + 1].coordinate, altitude: altitude)
-                makeLocationNode(a, b)
-            }
-        } else {
-            for i in 0 ..< locations.count - 1 {
-                let a: CLLocation = locations[i]
-                let b: CLLocation = locations[i + 1]
-                makeLocationNode(a, b)
-            }
-        }
     }
     
     private func makeLocationNode(_ a: CLLocation,
@@ -99,7 +100,8 @@ private extension PolylineNode {
         // Orient the line to point from currentLoction to nextLocation
         boxNode.eulerAngles.y = Float(bearing).degreesToRadians
 
-        let locationNode = LocationNode(location: c, tag: tag)
+        let locationNode = LocationNode(location: c,
+                                        tag: tag)
         locationNode.addChildNode(boxNode)
 
         locationNodes.append(locationNode)
