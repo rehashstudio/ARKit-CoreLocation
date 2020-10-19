@@ -303,8 +303,6 @@ public extension SceneLocationView {
     }
     
     func removeNodeFromScene(_ node: SCNNode) {
-        print( "\(sceneNode?.childNodes.count) nodes before removal" )
-        
         for child in node.childNodes {
             removeNodeFromScene(child)
         }
@@ -428,9 +426,7 @@ public extension SceneLocationView {
     func removeRoutes(routes: [MKRoute]) {
         routes.forEach { route in
             if let index = polylineNodes.firstIndex(where: { $0.polyline == route.polyline }) {
-                removeNodeFromScene(polylineNodes[index])
-                polylineNodes[index].removeFromParentNode()
-                polylineNodes.remove(at: index)
+                removePolyline(at: index)
             }
         }
     }
@@ -469,21 +465,23 @@ public extension SceneLocationView {
                                           locationNodeLocation: locationNodeLocation,
                                           locationManager: sceneLocationManager,
                                           onCompletion: {})
-
                 sceneNode?.addChildNode($0)
             }
         }
     }
 
     func removePolyline(title: String) {
+        print( "Removing \(title)")
         var i: Int = -1
         for node in polylineNodes {
             if node.polyline.title == title {
                 removePolyline(at: i)
+                print( "\(title) removed")
                 return
             }
             i += 1
         }
+        print( "\(title) not found")
     }
     
     func removePolyline(at index: Int) {
