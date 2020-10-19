@@ -419,7 +419,7 @@ public extension SceneLocationView {
                                           locationNodeLocation: locationNodeLocation,
                                           locationManager: sceneLocationManager,
                                           onCompletion: {})
-                //sceneNode?.addChildNode($0)
+                sceneNode?.addChildNode($0)
             }
         }
     }
@@ -466,7 +466,7 @@ public extension SceneLocationView {
                                           locationNodeLocation: locationNodeLocation,
                                           locationManager: sceneLocationManager,
                                           onCompletion: {})
-                //sceneNode?.addChildNode($0)
+                sceneNode?.addChildNode($0)
             }
         }
     }
