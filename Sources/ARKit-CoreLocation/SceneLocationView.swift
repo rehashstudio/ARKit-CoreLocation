@@ -315,13 +315,15 @@ public extension SceneLocationView {
     
     func removeNodeFromScene(_ node: SCNNode) {
         guard let childNodes = sceneNode?.childNodes else { return }
+        print( "\(childNodes.count) nodes before removal" )
         for child in childNodes {
             if node == child {
-                print( "Removing node: \(child.name)" )
+                print( "Removing node: \(child)" )
                 releaseNode(child)
-                print( "Removed node: \(child.name)" )
+                print( "Removed node: \(child)" )
             }
         }
+        print( "\(childNodes.count) nodes after removal" )
     }
 
     func removeAllNodes() {
