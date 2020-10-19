@@ -303,8 +303,7 @@ public extension SceneLocationView {
     }
     
     private func releaseNode(_ node: SCNNode) {
-        for child in node.childNodes {
-            child.geometry = nil
+        while let child = node.childNodes.first {
             releaseNode(child)
         }
         if let node = node as? PolylineNode {
@@ -316,9 +315,11 @@ public extension SceneLocationView {
     
     func removeNodeFromScene(_ node: SCNNode) {
         guard let childNodes = sceneNode?.childNodes else { return }
-        for child in childNodes {
+        while let child = childNodes.first {
             if node == child {
+                print( "Removing node: \(child.name)" )
                 releaseNode(child)
+                print( "Removed node: \(child.name)" )
             }
         }
     }
@@ -326,8 +327,8 @@ public extension SceneLocationView {
     func removeAllNodes() {
         locationNodes.removeAll()
         guard let childNodes = sceneNode?.childNodes else { return }
-        for node in childNodes {
-            releaseNode(node)
+        while let child = childNodes.first {
+            releaseNode(child)
         }
         polylineNodes = []
         locationNodes = []
@@ -468,7 +469,6 @@ public extension SceneLocationView {
 
         polylineNodes.forEach {
             $0.locationNodes.forEach {
-
                 let locationNodeLocation = self.locationOfLocationNode($0)
                 $0.updatePositionAndScale(setup: true,
                                           scenePosition: currentScenePosition,
