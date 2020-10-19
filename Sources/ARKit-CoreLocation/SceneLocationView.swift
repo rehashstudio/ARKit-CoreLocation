@@ -476,9 +476,11 @@ public extension SceneLocationView {
     
     func removePolyline(title: String) {
         var i: Int = -1
+        print("removePolyline( title: \(title) )")
         for node in polylineNodes {
             if node.polyline.title == title {
                 removePolyline(at: i)
+                print("\(title) found!")
                 return
             }
             i += 1
@@ -486,10 +488,12 @@ public extension SceneLocationView {
     }
     
     func removePolyline(at index: Int) {
+        print("removePolyline( at: \(index) )")
         if index >= 0 && index < polylineNodes.count {
             let node = polylineNodes[index]
             removePolylineNodeFromScene(node)
             polylineNodes.remove(at: index)
+            print("\(index) removed!")
         }
     }
     
