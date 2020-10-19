@@ -353,16 +353,14 @@ public extension SceneLocationView {
     }
     
     func removeLocationNode(tag: String) {
-        var i: Int = -1
+        var i: Int = 0
         for node in locationNodes {
             if node.tag == tag {
-                break
+                removeNodeFromScene(locationNodes[i])
+                locationNodes.remove(at: i)
+                return
             }
             i += 1
-        }
-        if i >= 0 {
-            removeNodeFromScene(locationNodes[i])
-            locationNodes.remove(at: i)
         }
     }
     
@@ -475,7 +473,7 @@ public extension SceneLocationView {
     }
     
     func removePolyline(title: String) {
-        var i: Int = -1
+        var i: Int = 0
         print("removePolyline( title: \(title) )")
         for node in polylineNodes {
             if node.polyline.title == title {
