@@ -302,28 +302,19 @@ public extension SceneLocationView {
         locationNodes.forEach { addLocationNodeWithConfirmedLocation(locationNode: $0) }
     }
     
-    private func releaseNode(_ node: SCNNode) {
+    func removeNodeFromScene(_ node: SCNNode) {
+        print( "\(sceneNode?.childNodes.count) nodes before removal" )
+        
         for child in node.childNodes {
-            releaseNode(child)
+            removeNodeFromScene(child)
         }
         if let node = node as? PolylineNode {
             node.boxBuilder = nil
         }
         node.geometry = nil
         node.removeFromParentNode()
-    }
-    
-    func removeNodeFromScene(_ node: SCNNode) {
-        guard let childNodes = sceneNode?.childNodes else { return }
-        print( "\(childNodes.count) nodes before removal" )
-        for child in childNodes {
-            if node == child {
-                print( "Removing node: \(child)" )
-                releaseNode(child)
-                print( "Removed node: \(child)" )
-            }
-        }
-        print( "\(childNodes.count) nodes after removal" )
+        
+        print( "\(sceneNode?.childNodes.count) nodes after removal" )
     }
 
     func removeAllNodes() {
@@ -332,7 +323,7 @@ public extension SceneLocationView {
         locationNodes = []
         if let childNodes = sceneNode?.childNodes {
             for child in childNodes {
-                releaseNode(child)
+                removeNodeFromScene(child)
             }
         }
     }
@@ -488,15 +479,18 @@ public extension SceneLocationView {
         var i: Int = -1
         for node in polylineNodes {
             if node.polyline.title == title {
-                break
+                removePolyline(at: i)
+                return
             }
             i += 1
         }
-        if i >= 0 {
-            removeNodeFromScene(polylineNodes[i])
-            polylineNodes[i].geometry = nil
-            polylineNodes[i].removeFromParentNode()
-            polylineNodes.remove(at: i)
+    }
+    
+    func removePolyline(at index: Int) {
+        if index >= 0 && index < polylineNodes.count {
+            let node = polylineNodes[index]
+            removeNodeFromScene(node)
+            polylineNodes.remove(at: index)
         }
     }
     
@@ -506,10 +500,7 @@ public extension SceneLocationView {
                                                         $0.polyline == polyline ||
                                                             $0.polyline.title == polyline.title
             }) {
-                removeNodeFromScene(polylineNodes[index])
-                polylineNodes[index].geometry = nil
-                polylineNodes[index].removeFromParentNode()
-                polylineNodes.remove(at: index)
+                removePolyline(at: index)
             }
         }
     }
