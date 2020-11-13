@@ -1,5 +1,5 @@
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '11.0'
+platform :ios, '13.4'
 use_frameworks!
 
 target 'ARKit+CoreLocation' do
