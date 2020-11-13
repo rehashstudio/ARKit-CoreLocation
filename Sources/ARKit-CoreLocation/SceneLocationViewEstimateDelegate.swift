@@ -17,13 +17,13 @@ public protocol LNTouchDelegate: class {
     func locationNodeTouched(node: LocationNode)
 }
 
-@available(iOS 11.0, *)
+
 public protocol SceneLocationViewEstimateDelegate: class {
     func didAddSceneLocationEstimate(sceneLocationView: SceneLocationView, position: SCNVector3, location: CLLocation)
     func didRemoveSceneLocationEstimate(sceneLocationView: SceneLocationView, position: SCNVector3, location: CLLocation)
 }
 
-@available(iOS 11.0, *)
+
 public extension SceneLocationViewEstimateDelegate {
     func didAddSceneLocationEstimate(sceneLocationView: SceneLocationView, position: SCNVector3, location: CLLocation) {
         //
@@ -33,7 +33,7 @@ public extension SceneLocationViewEstimateDelegate {
     }
 }
 
-@available(iOS 11.0, *)
+
 public protocol SceneLocationViewDelegate: class {
     ///After a node's location is initially set based on current location,
     ///it is later confirmed once the user moves far enough away from it.
@@ -46,7 +46,7 @@ public protocol SceneLocationViewDelegate: class {
 }
 
 /// Subset of delegate methods from ARSCNViewDelegate to be notified on tracking status changes
-@available(iOS 11.0, *)
+
 public protocol SceneTrackingDelegate: class {
 
     func sessionWasInterrupted(_ session: ARSession)
@@ -59,7 +59,7 @@ public protocol SceneTrackingDelegate: class {
 
 }
 
-@available(iOS 11.0, *)
+
 public extension SceneLocationViewDelegate {
     func didAddSceneLocationEstimate(sceneLocationView: SceneLocationView, position: SCNVector3, location: CLLocation) {
         //

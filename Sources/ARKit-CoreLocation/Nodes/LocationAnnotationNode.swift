@@ -10,6 +10,7 @@ import SceneKit
 import CoreLocation
 
 /// A `LocationNode` which has an attached `AnnotationNode`.
+
 open class LocationAnnotationNode: LocationNode {
     /// Subnodes and adjustments should be applied to this subnode
     /// Required to allow scaling at the same time as having a 2D 'billboard' appearance
@@ -38,7 +39,6 @@ open class LocationAnnotationNode: LocationNode {
         addChildNode(annotationNode)
     }
 
-    @available(iOS 10.0, *)
     /// Use this constructor to add a UIView as an annotation.  Keep in mind that it is not live, instead
     /// it's a "snapshot" of that UIView.  UIView is more configurable then a UIImage, allowing you to add
     /// background image, labels, etc.
@@ -127,7 +127,6 @@ open class LocationAnnotationNode: LocationNode {
 
 public extension UIView {
 
-    @available(iOS 10.0, *)
     /// Gets you an image from the view.
     var image: UIImage {
         let renderer = UIGraphicsImageRenderer(bounds: bounds)

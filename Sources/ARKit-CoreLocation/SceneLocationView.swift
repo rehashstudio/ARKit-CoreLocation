@@ -12,7 +12,7 @@ import CoreLocation
 import MapKit
 
 //Should conform to delegate here, add in future commit
-@available(iOS 11.0, *)
+
 
 /// `SceneLocationView` is the `ARSCNView` subclass used to render an ARCL scene.
 ///
@@ -187,7 +187,7 @@ open class SceneLocationView: ARSCNView {
     }
 }
 
-@available(iOS 11.0, *)
+
 public extension SceneLocationView {
     
     func run() {
@@ -376,7 +376,7 @@ public extension SceneLocationView {
     }
 }
 
-@available(iOS 11.0, *)
+
 public extension SceneLocationView {
     
     /// Adds routes to the scene and lets you specify the geometry prototype for the box.
@@ -434,7 +434,7 @@ public extension SceneLocationView {
     }
 }
 
-@available(iOS 11.0, *)
+
 public extension SceneLocationView {
     /// Adds polylines to the scene and lets you specify the geometry prototype for the box.
     /// Note: You can provide your own SCNBox prototype to base the direction nodes from.
@@ -507,7 +507,7 @@ public extension SceneLocationView {
     }
 }
 
-@available(iOS 11.0, *)
+
 extension SceneLocationView: SceneLocationManagerDelegate {
     var scenePosition: SCNVector3? { return currentScenePosition }
     

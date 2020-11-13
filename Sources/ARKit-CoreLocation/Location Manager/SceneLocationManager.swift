@@ -16,7 +16,7 @@ public enum LocationEstimateMethod {
     ///Only uses Core Location data.
     ///Not suitable for adding nodes using current position, which requires more precision.
     case coreLocationDataOnly
-
+    
     ///Combines knowledge about movement through the AR world with
     ///the most relevant Core Location estimate (based on accuracy and time).
     case mostRelevantEstimate
@@ -27,24 +27,27 @@ public enum LocationEstimateMethod {
 
 protocol SceneLocationManagerDelegate: class {
     var scenePosition: SCNVector3? { get }
-
+    
     func confirmLocationOfDistantLocationNodes()
     func updatePositionAndScaleOfLocationNodes()
-
+    
     func didAddSceneLocationEstimate(position: SCNVector3, location: CLLocation)
     func didRemoveSceneLocationEstimate(position: SCNVector3, location: CLLocation)
 }
 
+
 public final class SceneLocationManager {
     weak var sceneLocationDelegate: SceneLocationManagerDelegate?
-
+    
     public var locationEstimateMethod: LocationEstimateMethod = .mostRelevantEstimate
     public let locationManager = LocationManager()
-
+    
+    public var gpsAltitudeEnabled: Bool = true
+    
     var sceneLocationEstimates = [SceneLocationEstimate]()
-
+    
     var updateEstimatesTimer: Timer?
-
+    
     /// The best estimation of location that has been taken
     /// This takes into account horizontal accuracy, and the time at which the estimation was taken
     /// favouring the most accurate, and then the most recent result.
@@ -54,13 +57,13 @@ public final class SceneLocationManager {
             if $0.location.horizontalAccuracy == $1.location.horizontalAccuracy {
                 return $0.location.timestamp > $1.location.timestamp
             }
-
+            
             return $0.location.horizontalAccuracy < $1.location.horizontalAccuracy
         })
-
+        
         return sortedLocationEstimates.first
     }
-
+    
     private weak var _currentLocation: CLLocation?
     public var currentLocation: CLLocation? {
         get {
@@ -68,8 +71,8 @@ public final class SceneLocationManager {
                 return locationManager.currentLocation
             } else if locationEstimateMethod == .mostRelevantEstimate {
                 guard let bestEstimate = bestLocationEstimate,
-                    let position = sceneLocationDelegate?.scenePosition else { return nil }
-
+                      let position = sceneLocationDelegate?.scenePosition else { return nil }
+                
                 return bestEstimate.translatedLocation(to: position)
             }
             return _currentLocation
@@ -79,82 +82,85 @@ public final class SceneLocationManager {
             _currentLocation = newValue
         }
     }
-
+    
     init() {
         locationManager.delegate = self
     }
-
+    
     deinit {
         pause()
     }
-
+    
     @objc
     func updateLocationData() {
         removeOldLocationEstimates()
-
+        
         sceneLocationDelegate?.confirmLocationOfDistantLocationNodes()
         sceneLocationDelegate?.updatePositionAndScaleOfLocationNodes()
     }
-
+    
     ///Adds a scene location estimate based on current time, camera position and location from location manager
     public func addSceneLocationEstimate(location: CLLocation) {
         guard let position = sceneLocationDelegate?.scenePosition else { return }
-
+        
         sceneLocationEstimates.append(SceneLocationEstimate(location: location, position: position))
-
+        
         sceneLocationDelegate?.didAddSceneLocationEstimate(position: position, location: location)
     }
-
+    
     public func removeOldLocationEstimates() {
         guard let currentScenePosition = sceneLocationDelegate?.scenePosition else { return }
         removeOldLocationEstimates(currentScenePosition: currentScenePosition)
     }
-
+    
     func removeOldLocationEstimates(currentScenePosition: SCNVector3) {
         let currentPoint = CGPoint.pointWithVector(vector: currentScenePosition)
-
+        
         sceneLocationEstimates = sceneLocationEstimates.filter {
-            if #available(iOS 11.0, *) {
-                let radiusContainsPoint = currentPoint.radiusContainsPoint(
-                    radius: CGFloat(SceneLocationView.sceneLimit),
-                    point: CGPoint.pointWithVector(vector: $0.position))
-
-                if !radiusContainsPoint {
-                    sceneLocationDelegate?.didRemoveSceneLocationEstimate(position: $0.position, location: $0.location)
-                }
-
-                return radiusContainsPoint
-            } else {
-                return false
+            let radiusContainsPoint = currentPoint.radiusContainsPoint(
+                radius: CGFloat(SceneLocationView.sceneLimit),
+                point: CGPoint.pointWithVector(vector: $0.position))
+            
+            if !radiusContainsPoint {
+                sceneLocationDelegate?.didRemoveSceneLocationEstimate(position: $0.position, location: $0.location)
             }
+            
+            return radiusContainsPoint
         }
     }
-
+    
 }
+
 
 public extension SceneLocationManager {
     func run() {
         pause()
-		if #available(iOS 11.0, *) {
-			updateEstimatesTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
-				self?.updateLocationData()
-			}
-		} else {
-			assertionFailure("Needs iOS 9 and 10 support")
-		}
+        updateEstimatesTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) {
+            [weak self] _ in
+            self?.updateLocationData()
+        }
     }
-
+    
     func pause() {
         updateEstimatesTimer?.invalidate()
         updateEstimatesTimer = nil
     }
 }
 
+
 extension SceneLocationManager: LocationManagerDelegate {
     func locationManagerDidUpdateLocation(_ locationManager: LocationManager,
                                           location: CLLocation) {
         if locationEstimateMethod != .none {
-            addSceneLocationEstimate(location: location)
+            addSceneLocationEstimate(location: CLLocation(coordinate: location.coordinate,
+                                                          altitude: self.gpsAltitudeEnabled ? location.altitude : 0.0,
+                                                          horizontalAccuracy: location.horizontalAccuracy,
+                                                          verticalAccuracy: location.verticalAccuracy,
+                                                          course: location.course,
+                                                          courseAccuracy: location.courseAccuracy,
+                                                          speed: location.speed,
+                                                          speedAccuracy: location.speedAccuracy,
+                                                          timestamp: location.timestamp))
         }
     }
 }

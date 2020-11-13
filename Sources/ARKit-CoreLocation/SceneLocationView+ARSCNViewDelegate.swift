@@ -13,7 +13,7 @@ import MapKit
 
 // MARK: - ARSCNViewDelegate
 
-@available(iOS 11.0, *)
+
 extension SceneLocationView: ARSCNViewDelegate {
 
     public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
@@ -40,7 +40,7 @@ extension SceneLocationView: ARSCNViewDelegate {
 
 // MARK: - ARSessionObserver
 
-@available(iOS 11.0, *)
+
 extension SceneLocationView {
 
     public func session(_ session: ARSession, didFailWithError error: Error) {
@@ -90,7 +90,7 @@ extension SceneLocationView {
         sceneTrackingDelegate?.sessionInterruptionEnded(session)
     }
 
-    @available(iOS 11.3, *)
+    
     public func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
         return arViewDelegate?.sessionShouldAttemptRelocalization?(session) ?? true
     }
@@ -103,7 +103,7 @@ extension SceneLocationView {
 
 // MARK: - SCNSceneRendererDelegate
 
-@available(iOS 11.0, *)
+
 extension SceneLocationView {
 
     public func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
