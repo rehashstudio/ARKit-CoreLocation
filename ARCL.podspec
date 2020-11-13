@@ -6,11 +6,11 @@ Pod::Spec.new do |s|
   s.author       = { "Andrew Hart" => "Andrew@ProjectDent.com" }
   s.license      = { :type => 'MIT', :file => 'LICENSE'  }
   s.source       = { :git => "https://ProjectDent@github.com/ProjectDent/ARKit-CoreLocation.git", :tag => s.version.to_s, :submodules => false }
-  s.platform     = :ios, '9.0'
+  s.platform     = :ios, '13.4'
   s.swift_version = "5.0"
   s.requires_arc = true
   s.source_files = 'Sources/**/*.{swift}'
   s.frameworks   = 'Foundation', 'UIKit', 'CoreLocation', 'MapKit', 'SceneKit'
   s.weak_frameworks   = 'ARKit'
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '13.4'
 end
